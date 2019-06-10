@@ -9,6 +9,6 @@ This application is a containerized, Python-based speech to text application tha
 
 3. CD into the speech_app/speech directory.
 
-4. On the command line enter [Docker build --tag=speech .] to build a Docker image of the program. Docker will build an image with all required dependencies to run the speech.py file.
+4. On the command line enter [Docker build --tag=speech .] to build a Docker image of the program. Docker will build an image with all required dependencies to create a container for the speech program.
 
-5. Once Docker has built the image, enter [Docker run speech] on the command line while in the speech_app/speech directory. This will create a container running the speech.py program. Docker volumes haven't been set up yet, so the program will execute but the transcript will not be stored on your computer.
+5. Once Docker has built the image, enter [Docker run speech] on the command line while in the speech_app/speech directory. This will create a container running the speech program. Docker volumes haven't been set up yet, so the program will execute but the transcript will not be stored on your computer.
