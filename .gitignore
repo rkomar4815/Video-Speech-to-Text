@@ -115,6 +115,7 @@ dmypy.json
 
 #VScode
 .vs-code
+.code-workspace
 
 #DS_store
 .DS_store
