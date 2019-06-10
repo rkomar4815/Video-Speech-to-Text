@@ -1,0 +1,9 @@
+pydub
+youtube_dl
+ffmpeg-python
+pandas
+google-cloud-speech
+google-cloud-storage
+google-auth
+googleapis-common-protos
+
