@@ -2,7 +2,7 @@ import speechfuncs
 import config
 
 
-config.URL = 'https://www.youtube.com/watch?v=CFZETWI6cno'
+config.URL = 'https://www.youtube.com/watch?v=MevKTPN4ozw'
 
 speechfuncs.yt_downloader(config.URL)
 
@@ -24,7 +24,7 @@ config.gcs_uri = speechfuncs.gcloud_uploader(
 speechfuncs.file_remover(config.outputfilename)
 
 print('AI is conducting analysis!')
-config.words = speechfuncs.videotranscribe(config.gcs_uri, 1)
+config.words = speechfuncs.videotranscribe(config.gcs_uri, 2)
 
 print(config.words)
 
