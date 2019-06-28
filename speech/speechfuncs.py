@@ -12,6 +12,17 @@ import ffmpeg
 import pandas as pd
 
 
+
+
+
+class transcript:
+    def ___init___(url, speakernum):
+        self.url = url
+        self.speakernum = speakernum
+
+
+
+
 def my_hook(d):  # changes filename string from .webm to .flac
     if d['status'] == 'finished':
         filename = str(d['filename'])
