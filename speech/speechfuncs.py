@@ -16,10 +16,12 @@ import pandas as pd
 
 
 class transcript:
+
     def ___init___(url, speakernum):
         self.url = url
         self.speakernum = speakernum
 
+class youtube
 
 
 
