@@ -122,3 +122,8 @@ dmypy.json
 
 #JSON keys
 gcredkey.json
+*.json
+
+#Other
+.vs-code/
+.vs-code

@@ -11,6 +11,16 @@ import os
 import ffmpeg
 import pandas as pd
 
+'''
+This module converts any youtube or soundcloud video/audio file into a text file transcript with unique speakers identified
+
+The GCP Speech to Text AI used in this module is diarization enabled meaning it will identify unique speakers in audio
+Currently, GCP's diarized Speech to Text AI is in beta, so there will be some bugs when long videos are passed through
+
+This module uses GCP blob storage and the GCP Speech to Text AI API so you will need to have GCP set up to use this module
+
+'''
+
 
 def main(url, speakernum):
 
@@ -29,7 +39,7 @@ def main(url, speakernum):
 
     words = videotranscribe(config.gcs_uri, speakernum)
 
-    transcript_maker(words, config.filename)
+    _transcript_maker(words, config.filename)
 
     delete_blob(
         config.gcred, config.project,
@@ -37,8 +47,10 @@ def main(url, speakernum):
     )
 
 
+# Hooks for Youtube-dl
+# Youtube videos are either downloaded as .webm files or .m4a files
 
-def my_hook(d):  # changes filename string from .webm to .flac
+def _my_hook(d):  # changes filename string from .webm to .flac
     if d['status'] == 'finished':
         filename = str(d['filename'])
         if '.webm' in str(filename):
@@ -47,7 +59,6 @@ def my_hook(d):  # changes filename string from .webm to .flac
             config.filename = str(filename).replace('.m4a', '.flac')
         else:
             print('Filename conversion error.')
-        
 
 
 def yt_downloader(URL):
@@ -59,19 +70,21 @@ def yt_downloader(URL):
             'key': 'FFmpegExtractAudio',
             'preferredcodec': 'flac',  # AI needs FLAC
             'preferredquality': '0'
-            }],
-        'progress_hooks': [my_hook]
+        }],
+        'progress_hooks': [_my_hook]
     }
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         ydl.download([URL])
 
 #  Converts flac file from stereo to mono
+#  Google Cloud Speech to Text AI only works with mono audio
+#  This returns the updated filename after the FLAC file is converted to mono
 
 
 def stereo_to_mono(filename):
     newfilename = str(filename).replace(
         '.flac', '_mono.flac'
-        )
+    )
 
     ffmpeg.input(filename).output(newfilename, ac=1).run()
 
@@ -79,33 +92,35 @@ def stereo_to_mono(filename):
 
     return newfilename
 
-#  The section below uses PyDub to remove silent chunks from the .mp3 file
-#  Note that this only removes silent chunks from the start and end of the .mp3
-
-
-def detect_leading_silence(sound, silence_threshold=-50.0, chunk_size=10000):
-    trim_ms = 0  # ms
-    assert chunk_size > 0  # to avoid infinite loops
-    while sound[
-                trim_ms:trim_ms+chunk_size
-                ].dBFS < silence_threshold and trim_ms < len(sound):
-        trim_ms += chunk_size
-    return trim_ms
+#  The function below uses PyDub to remove silent chunks from the audio file
+#  Note that this only removes silent chunks from the start and end of audio file
 
 
 def silence_trim(outputfilename):
     sound = AudioSegment.from_file(str(outputfilename), format='flac')
-    start_trim = detect_leading_silence(sound)
-    end_trim = detect_leading_silence(sound.reverse())
+    start_trim = _detect_leading_silence(sound)
+    end_trim = _detect_leading_silence(sound.reverse())
     duration = len(sound)
     trimmed_sound = sound[start_trim:duration-end_trim]
     trimmed_sound.export(
         str(outputfilename), format='flac'
-        )
+    )
+
     return outputfilename
 
 
-#  The section below uploads the audio file to Google Cloud
+def _detect_leading_silence(sound, silence_threshold=-50.0, chunk_size=10000):
+    trim_ms = 0  # ms
+    assert chunk_size > 0  # to avoid infinite loops
+    while sound[
+        trim_ms:trim_ms+chunk_size
+    ].dBFS < silence_threshold and trim_ms < len(sound):
+        trim_ms += chunk_size
+
+    return trim_ms
+
+
+#  Uploads files to Google Cloud blob storage
 
 def gcloud_uploader(gcred, project, bucketname, outputfilename):
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = gcred
@@ -122,7 +137,7 @@ def gcloud_uploader(gcred, project, bucketname, outputfilename):
     return gcs_uri
 
 
-#  AI Speech to text
+#  Transcribes an audio file based on a passed through speakercount and GCS URI
 
 
 def videotranscribe(gcs_uri, speakercount):
@@ -138,7 +153,7 @@ def videotranscribe(gcs_uri, speakercount):
         enable_word_time_offsets=True,
         model='video',
         enable_automatic_punctuation=True
-        )
+    )
 
     operation = client.long_running_recognize(config, audio)
 
@@ -155,7 +170,7 @@ def videotranscribe(gcs_uri, speakercount):
     return words
 
 
-def transcript_maker(words, filename):
+def _transcript_maker(words, filename):
     words_df = pd.DataFrame(words)
 
     if 'speakerTag' in words_df:
@@ -175,7 +190,7 @@ def transcript_maker(words, filename):
         pd.set_option('display.max_colwidth', -1)
 
         print(transcript_df)
-        
+
         textfilename = filename.replace('_mono.flac', '.txt')
 
         transcriptfile = open(textfilename, 'a')
@@ -189,8 +204,7 @@ def transcript_maker(words, filename):
         transcriptfile.close()
 
 
-
-#  Deletes blob from Google Cloud
+#  Deletes a file in Google Cloud blob storage
 
 def delete_blob(gcred, project, bucket, outputfilename):
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = gcred
@@ -202,7 +216,6 @@ def delete_blob(gcred, project, bucket, outputfilename):
     blob.delete()
 
 
-
 if __name__ == "__main__":
 
-    main('https://www.youtube.com/watch?v=CFZETWI6cno', 1)
+    main()
