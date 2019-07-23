@@ -10,6 +10,7 @@ import config
 import os
 import ffmpeg
 import pandas as pd
+import sys
 
 '''
 This module converts any youtube or soundcloud video/audio file into a text file transcript with unique speakers identified.
@@ -20,6 +21,8 @@ However, GCP's diarized Speech to Text AI is in beta, so there may be some bugs 
 
 
 def main(url, speakernum):
+
+    speakernum = int(speakernum)
 
     yt_downloader(url)
 
@@ -217,4 +220,4 @@ def delete_blob(gcred, project, bucket, outputfilename):
 
 if __name__ == "__main__":
 
-    main()
+    main(*sys.argv[1:])

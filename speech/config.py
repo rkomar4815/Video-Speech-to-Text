@@ -3,5 +3,5 @@ project = 'committeehearingtotext'
 bucket = 'hearingtotext'
 gcs_uri = None
 words = None
-gcred = 'gcredkey.json'
+gcred = 'committeehearingtotext-d022be9793f0.json'
 speakernum = None
