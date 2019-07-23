@@ -1,13 +1,7 @@
 # speech_app
 
-This application is a containerized, Python-based speech to text application that converts Youtube videos to transcripts using a Google Cloud Platform AI API.
+Let's say you're an analyst at Big Tech Company™ and the CEO wants to know what Tech reviewers on Youtube think of the company's latest laptop. You could manually watch every laptop review on YouTube and write a report, but that takes a long time. If there were 100 15-minute review vidoes, you'd have to spend a full 25 hours watching videos.
 
-1. Clone this repo to your local machine.
+That's not realistic. Instead, let's use this program to convert the videos into a transcript. That way you'd be able to simply read transcripts for each video and save countless hours. Watch how the program works below.
 
-2. If you don't already have docker installed. Install it at https://www.docker.com/products/docker-desktop.
 
-3. CD into the speech_app/speech directory.
-
-4. On the command line enter [Docker build --tag=speech .] to build a Docker image of the program. Docker will build an image with all required dependencies to create a container for the speech program.
-
-5. Once Docker has built the image, enter [Docker run speech] on the command line while in the speech_app/speech directory. This will create a container running the speech program. Docker volumes haven't been set up yet, so the program will execute but the transcript will not be stored on your computer.
