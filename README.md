@@ -1,7 +1,6 @@
 # speech_app
 
-This application is a containerized, Python-based speech to text application that converts Youtube videos to transcripts using AI.
-
+This application is a containerized, Python-based speech to text application that converts Youtube videos to transcripts using a Google Cloud Platform AI API.
 
 1. Clone this repo to your local machine.
 
