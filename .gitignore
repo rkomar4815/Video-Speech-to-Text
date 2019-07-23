@@ -125,3 +125,8 @@ dmypy.json
 #JSON keys
 gcredkey.json
 *.json
+
+#webm/m4a
+
+*.webm
+*.m4a
