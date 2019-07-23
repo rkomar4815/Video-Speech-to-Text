@@ -12,13 +12,10 @@ import ffmpeg
 import pandas as pd
 
 '''
-This module converts any youtube or soundcloud video/audio file into a text file transcript with unique speakers identified
+This module converts any youtube or soundcloud video/audio file into a text file transcript with unique speakers identified.
 
-The GCP Speech to Text AI used in this module is diarization enabled meaning it will identify unique speakers in audio
-Currently, GCP's diarized Speech to Text AI is in beta, so there will be some bugs when long videos are passed through
-
-This module uses GCP blob storage and the GCP Speech to Text AI API so you will need to have GCP set up to use this module
-
+The GCP Speech to Text AI used in this module is diarization enabled meaning it will identify unique speakers in audio.
+However, GCP's diarized Speech to Text AI is in beta, so there may be some bugs when long videos are analyzed.
 '''
 
 
@@ -194,6 +191,7 @@ def _transcript_maker(words, filename):
         textfilename = filename.replace('_mono.flac', '.txt')
 
         transcriptfile = open(textfilename, 'a')
+
         transcriptfile.write(transcript_df.to_string(
             index=False,
             columns=['startTime', 'speakerTag', 'transcript'],
@@ -201,6 +199,7 @@ def _transcript_maker(words, filename):
                 {'startTime': '\n StartTime: {:} \n'.format,
                     'speakerTag': '\n Speaker {:}: \n'.format,
                     'transcript': '\n {:} \n'.format})))
+
         transcriptfile.close()
 
 
