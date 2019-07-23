@@ -39,7 +39,7 @@ def main(url, speakernum):
 
     words = videotranscribe(config.gcs_uri, speakernum)
 
-    _transcript_maker(words, config.filename)
+    _transcript_maker_diarized(words, config.filename)
 
     delete_blob(
         config.gcred, config.project,
@@ -170,40 +170,34 @@ def videotranscribe(gcs_uri, speakercount):
     return words
 
 
-def _transcript_maker(words, filename):
+def _transcript_maker_diarized(words, filename):
     words_df = pd.DataFrame(words)
 
-    if 'speakerTag' in words_df:
+    words_df['current_speaker'] = (
+        words_df.speakerTag.shift() != words_df.speakerTag).cumsum()
 
-        words_df['current_speaker'] = (
-            words_df.speakerTag.shift() != words_df.speakerTag).cumsum()
+    transcript_df = words_df.groupby('current_speaker').agg({
+        'startTime': min,
+        'speakerTag': min,
+        'word': lambda x: ' '.join(x),
+        'endTime': max
+    }).rename(columns={'word': 'transcript'})
 
-        transcript_df = words_df.groupby('current_speaker').agg({
-            'startTime': min,
-            'speakerTag': min,
-            'word': lambda x: ' '.join(x),
-            'endTime': max
-        }).rename(columns={'word': 'transcript'})
+    transcript_df[['speakerTag', 'transcript']].to_json(orient='records')
 
-        transcript_df[['speakerTag', 'transcript']].to_json(orient='records')
+    textfilename = filename.replace('_mono.flac', '.txt')
 
-        pd.set_option('display.max_colwidth', -1)
+    with open(textfilename, 'w') as file:
 
-        print(transcript_df)
-
-        textfilename = filename.replace('_mono.flac', '.txt')
-
-        transcriptfile = open(textfilename, 'a')
-
-        transcriptfile.write(transcript_df.to_string(
+        transcript = transcript_df.to_string(
             index=False,
             columns=['startTime', 'speakerTag', 'transcript'],
             header=False, formatters=(
                 {'startTime': '\n StartTime: {:} \n'.format,
                     'speakerTag': '\n Speaker {:}: \n'.format,
-                    'transcript': '\n {:} \n'.format})))
+                    'transcript': '\n {:} \n'.format}))
 
-        transcriptfile.close()
+        file.write(transcript)
 
 
 #  Deletes a file in Google Cloud blob storage
