@@ -10,3 +10,6 @@ That's not realistic. Instead, let's use this program to convert the videos into
 </a>
 </p>
 
+
+
+<b>Note: this program uses Google Cloud Platform blob storage and Speech AI's and wont work on your local machine.</b>
