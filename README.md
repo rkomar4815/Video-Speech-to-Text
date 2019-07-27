@@ -4,8 +4,9 @@ Let's say you're an analyst at Big Tech Company™ and the CEO wants to know wha
 
 That's not realistic. Instead, let's use this program to convert the videos into a transcript. That way you'd be able to simply read transcripts for each video and save countless hours. Watch how the program works below.
 
-<div style="center">
+<p align="center">
 <a href="https://www.youtube.com/watch?v=ymnZ_3eJEew&feature=youtu.be">
   <img src="http://img.youtube.com/vi/ymnZ_3eJEew/0.jpg"></img>
 </a>
-</div>
+</p>
+
