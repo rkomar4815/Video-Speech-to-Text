@@ -12,4 +12,4 @@ That's not realistic. Instead, let's use this program to convert the videos into
 
 
 
-<b>Note: this program uses Google Cloud Platform blob storage and Speech AI's and wont work on your local machine.</b>
+<b>Note: this program uses Google Cloud Platform blob storage and Speech AI APIs and wont work on your local machine.</b>
