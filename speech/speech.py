@@ -44,20 +44,37 @@ def main(url, speakernum=1):
     if speakernum != 1:
 
         config.words = diarized_transcribe(
-            config.gcred, config.gcs_uri, speakernum)
+            config.gcred, config.gcs_uri,
+            speakernum
+        )
 
-        _diarized_transcript_maker(config.words, config.filename)
+        textfilename = _diarized_transcript_maker(
+            config.words, config.filename
+        )
 
     else:
 
-        config.words = standard_transcribe(config.gcred, config.gcs_uri)
+        config.words = standard_transcribe(
+            config.gcred, config.gcs_uri
+        )
 
-        _standard_transcript_maker(config.words, config.filename)
+        textfilename = _standard_transcript_maker(
+            config.words, config.filename
+        )
 
     delete_blob(
         config.gcred, config.project,
         config.bucket, config.filename
     )
+
+    transcript_uri = gcloud_uploader(
+        config.gcred, config.project,
+        config.bucket, textfilename
+    )
+
+    os.remove(textfilename)
+
+    return transcript_uri
 
 
 # Hooks for Youtube-dl
@@ -138,7 +155,7 @@ def _detect_leading_silence(sound, silence_threshold=-50.0, chunk_size=10000):
 def gcloud_uploader(gcred, project, bucketname, outputfilename):
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = gcred
 
-    storage_client = storage.Client(project=project)
+    storage_client = storage.Client(project)
 
     bucket = storage_client.get_bucket(bucketname)  # your bucket name
 
@@ -213,6 +230,8 @@ def _diarized_transcript_maker(transcript, filename):
                     'speakerTag': '\n Speaker {:}: \n'.format,
                     'transcript': '\n {:} \n'.format})))
 
+    return textfilename
+
 
 # Transcribes an audio file with only one speaker and no punctuation
 
@@ -248,6 +267,8 @@ def _standard_transcript_maker(transcript, filename):
     with open(textfilename, 'a') as file:
 
         file.write(transcript)
+
+    return textfilename
 
 
 #  Deletes a file in Google Cloud blob storage
