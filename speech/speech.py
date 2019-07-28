@@ -128,10 +128,13 @@ def stereo_to_mono(filename):
 
 def silence_trim(outputfilename):
     sound = AudioSegment.from_file(str(outputfilename), format='flac')
+
     start_trim = _detect_leading_silence(sound)
     end_trim = _detect_leading_silence(sound.reverse())
     duration = len(sound)
+
     trimmed_sound = sound[start_trim:duration-end_trim]
+
     trimmed_sound.export(
         str(outputfilename), format='flac'
     )
