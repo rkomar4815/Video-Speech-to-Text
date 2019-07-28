@@ -14,6 +14,7 @@ import os
 import ffmpeg
 import pandas as pd
 import sys
+import threading
 
 '''
 This module converts any youtube video to a transcript
@@ -32,39 +33,42 @@ def main(url, speakernum=1):
 
     yt_downloader(url)
 
-    config.filename = stereo_to_mono(config.filename)
+    lock = threading.RLock()  # lock config.filename
 
-    config.gcs_uri = gcloud_uploader(
+    with lock:
+        local_filename = stereo_to_mono(config.filename)
+
+    gcs_uri = gcloud_uploader(
         config.gcred, config.project,
-        config.bucket, config.filename
+        config.bucket, local_filename
     )
 
-    os.remove(config.filename)
+    os.remove(local_filename)
 
     if speakernum != 1:
 
-        config.words = diarized_transcribe(
-            config.gcred, config.gcs_uri,
+        words = diarized_transcribe(
+            config.gcred, gcs_uri,
             speakernum
         )
 
         textfilename = _diarized_transcript_maker(
-            config.words, config.filename
+            words, local_filename
         )
 
     else:
 
-        config.words = standard_transcribe(
-            config.gcred, config.gcs_uri
+        words = standard_transcribe(
+            config.gcred, gcs_uri
         )
 
         textfilename = _standard_transcript_maker(
-            config.words, config.filename
+            words, local_filename
         )
 
     delete_blob(
         config.gcred, config.project,
-        config.bucket, config.filename
+        config.bucket, local_filename
     )
 
     transcript_uri = gcloud_uploader(
