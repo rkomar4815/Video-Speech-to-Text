@@ -4,3 +4,5 @@ Let's say you're an analyst at Big Tech Company™ and the CEO wants to know wha
 
 That's not realistic. Instead, let's use this program to convert the videos into a transcript. That way you'd be able to simply read transcripts for each video and save countless hours.
 
+
+<b> Note: This program uses Google Cloud Platform (GCP) blob storage and Speech beta AIs and will not work on your local machine. </b>
