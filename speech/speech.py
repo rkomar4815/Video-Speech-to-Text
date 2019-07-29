@@ -101,6 +101,8 @@ def yt_downloader(URL):
         'format': 'bestaudio/best',
         'restrictfilenames': 'true',
         'forcefilename': 'true',
+        'sleep_interval': 60,
+        'max_sleep_interval': 120,
         'postprocessors': [{
             'key': 'FFmpegExtractAudio',
             'preferredcodec': 'flac',  # AI needs FLAC
