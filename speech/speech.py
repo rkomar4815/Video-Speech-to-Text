@@ -31,11 +31,12 @@ def main(url, speakernum=1):
 
     speakernum = int(speakernum)
 
-    yt_downloader(url)
-
     lock = threading.RLock()  # lock config.filename
 
     with lock:
+
+        yt_downloader(url)
+
         local_filename = stereo_to_mono(config.filename)
 
     gcs_uri = gcloud_uploader(
@@ -120,7 +121,7 @@ def stereo_to_mono(filename):
         '.flac', '_mono.flac'
     )
 
-    ffmpeg.input(filename).output(newfilename, ac=1).run()
+    ffmpeg.input(filename).output(newfilename, ac=1).overwrite_output().run()
 
     os.remove(filename)
 

@@ -1,4 +1,3 @@
 # __init__.py
-
-from .config import *
-from .speech import *
+from .speech import config
+from .speech import speech
