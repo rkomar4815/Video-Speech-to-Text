@@ -17,6 +17,8 @@ def thread_downloader(urls):
 
     results = zip(urls, URIs)
 
+    print(results)
+
     return results
 
 
