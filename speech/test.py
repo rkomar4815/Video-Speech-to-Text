@@ -3,7 +3,8 @@ from multiprocessing.dummy import Pool as ThreadPool
 
 
 urls = ['https://www.youtube.com/watch?v=Eyvw3fVWMk8',
-        'https://www.youtube.com/watch?v=RQIG7XYqkK8']
+        'https://www.youtube.com/watch?v=RQIG7XYqkK8',
+        'https://www.youtube.com/watch?v=xsiV_-o5488']
 
 
 def thread_downloader(urls):
@@ -16,8 +17,6 @@ def thread_downloader(urls):
     pool.join()
 
     results = zip(urls, URIs)
-
-    print(results)
 
     return results
 

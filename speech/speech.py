@@ -31,20 +31,19 @@ def main(url, speakernum=1):
 
     speakernum = int(speakernum)
 
-    lock = threading.RLock()  # lock config.filename
+    config.varlock = threading.RLock()  # lock config
 
-    with lock:
-
+    with config.varlock:
         yt_downloader(url)
 
         local_filename = stereo_to_mono(config.filename)
+
+        os.remove(config.filename)
 
     gcs_uri = gcloud_uploader(
         config.gcred, config.project,
         config.bucket, local_filename
     )
-
-    os.remove(local_filename)
 
     if speakernum != 1:
 
@@ -78,6 +77,7 @@ def main(url, speakernum=1):
     )
 
     os.remove(textfilename)
+    os.remove(local_filename)
 
     return transcript_uri
 
@@ -101,8 +101,6 @@ def yt_downloader(URL):
         'format': 'bestaudio/best',
         'restrictfilenames': 'true',
         'forcefilename': 'true',
-        'sleep_interval': 60,
-        'max_sleep_interval': 120,
         'postprocessors': [{
             'key': 'FFmpegExtractAudio',
             'preferredcodec': 'flac',  # AI needs FLAC
@@ -124,8 +122,6 @@ def stereo_to_mono(filename):
     )
 
     ffmpeg.input(filename).output(newfilename, ac=1).overwrite_output().run()
-
-    os.remove(filename)
 
     return newfilename
 
