@@ -85,13 +85,18 @@ def main(url, speakernum=1):
 # Hooks for Youtube-dl
 # Youtube videos are either downloaded as .webm files or .m4a files
 
+''' TO DO: Have hook return filename instead of using global variables'''
+
+
 def _my_hook(d):  # changes filename from .webm to .flac post conversion
     if d['status'] == 'finished':
         filename = str(d['filename'])
         if '.webm' in str(filename):
             config.filename = str(filename).replace('.webm', '.flac')
+
         elif '.m4a' in str(filename):
             config.filename = str(filename).replace('.m4a', '.flac')
+
         else:
             print('Filename conversion error.')
 
