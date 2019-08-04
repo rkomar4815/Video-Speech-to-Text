@@ -16,8 +16,6 @@ import pandas as pd
 import sys
 
 
-
-
 '''
 This module converts any youtube video to a transcript
 
@@ -307,4 +305,3 @@ def delete_blob(gcred, project, bucket, outputfilename):
 if __name__ == "__main__":
 
     main(*sys.argv[1:])
-
