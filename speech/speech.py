@@ -14,7 +14,9 @@ import os
 import ffmpeg
 import pandas as pd
 import sys
-import threading
+
+
+
 
 '''
 This module converts any youtube video to a transcript
@@ -31,19 +33,18 @@ def main(url, speakernum=1):
 
     speakernum = int(speakernum)
 
-    config.varlock = threading.RLock()  # lock config
+    filename = yt_downloader(url)
 
-    with config.varlock:
-        yt_downloader(url)
+    local_filename = stereo_to_mono(filename)
 
-        local_filename = stereo_to_mono(config.filename)
-
-        os.remove(config.filename)
+    os.remove(filename)
 
     gcs_uri = gcloud_uploader(
         config.gcred, config.project,
         config.bucket, local_filename
     )
+
+    os.remove(local_filename)
 
     if speakernum != 1:
 
@@ -77,31 +78,34 @@ def main(url, speakernum=1):
     )
 
     os.remove(textfilename)
-    os.remove(local_filename)
 
     return transcript_uri
 
 
-# Hooks for Youtube-dl
-# Youtube videos are either downloaded as .webm files or .m4a files
-
-''' TO DO: Have hook return filename instead of using global variables'''
-
-
-def _my_hook(d):  # changes filename from .webm to .flac post conversion
-    if d['status'] == 'finished':
-        filename = str(d['filename'])
-        if '.webm' in str(filename):
-            config.filename = str(filename).replace('.webm', '.flac')
-
-        elif '.m4a' in str(filename):
-            config.filename = str(filename).replace('.m4a', '.flac')
-
-        else:
-            print('Filename conversion error.')
-
-
 def yt_downloader(URL):
+
+    filename = None
+
+    # Hooks for Youtube-dl
+    # Youtube videos are either downloaded as .webm files or .m4a files
+
+    def _my_hook(d):  # changes filename from .webm to .flac post conversion
+
+        if d['status'] == 'finished':
+
+            nonlocal filename
+
+            filename = str(d['filename'])
+
+            if '.webm' in filename:
+                filename = str(filename).replace('.webm', '.flac')
+
+            elif '.m4a' in filename:
+                filename = str(filename).replace('.m4a', '.flac')
+
+            else:
+                print('Filename conversion error.')
+
     ydl_opts = {
         'format': 'bestaudio/best',
         'restrictfilenames': 'true',
@@ -113,8 +117,12 @@ def yt_downloader(URL):
         }],
         'progress_hooks': [_my_hook]
     }
+
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         ydl.download([URL])
+
+        return filename
+
 
 #  Converts flac file from stereo to mono
 #  Google Cloud Speech to Text AI only works with mono audio
@@ -122,11 +130,13 @@ def yt_downloader(URL):
 
 
 def stereo_to_mono(filename):
+
     newfilename = str(filename).replace(
         '.flac', '_mono.flac'
     )
 
-    ffmpeg.input(filename).output(newfilename, ac=1).overwrite_output().run()
+    ffmpeg.input(filename).output(
+        newfilename, ac=1).overwrite_output().run()
 
     return newfilename
 
@@ -297,3 +307,4 @@ def delete_blob(gcred, project, bucket, outputfilename):
 if __name__ == "__main__":
 
     main(*sys.argv[1:])
+

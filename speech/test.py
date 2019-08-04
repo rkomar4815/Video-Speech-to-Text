@@ -1,26 +1,30 @@
 import speech
-from multiprocessing.dummy import Pool as ThreadPool
-
-
-urls = ['https://www.youtube.com/watch?v=Eyvw3fVWMk8',
-        'https://www.youtube.com/watch?v=RQIG7XYqkK8',
-        'https://www.youtube.com/watch?v=xsiV_-o5488']
-
+import concurrent.futures
 
 def thread_downloader(urls):
 
-    pool = ThreadPool(4)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+        # Start the load operations and mark each future with its URL
+        URI_to_URL = {executor.submit(
+            speech.main, url, 1): url for url in URLS}
 
-    URIs = pool.map(speech.main, urls)
+        for future in concurrent.futures.as_completed(URI_to_URL):
 
-    pool.close()
-    pool.join()
+            url = URI_to_URL[future]
+            print(url)
 
-    results = zip(urls, URIs)
+            try:
+                data = future.result()
+                print(data)
 
-    return results
+            except Exception as exc:
+                print('%r generated an exception: %s' % (url, exc))
+
+        return data
 
 
 if __name__ == "__main__":
 
-    thread_downloader(urls)
+    test = thread_downloader(URLS)
+
+    print(test)
