@@ -2,10 +2,17 @@ import speech
 import concurrent.futures
 
 
-def thread_downloader(urls):
+'''
+Multithreaded version of speech.main with 5 workers and no diarization
+
+Returns a dictionary of Youtube URLs and GCP URI of the associated transcript
+'''
+
+
+def speech_daemon(urls):
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-        # Start the load operations and mark each future with its URL
+        # Start the load operations and mark each URL with its future GCP URI
 
         data = {}
 
@@ -33,6 +40,6 @@ if __name__ == "__main__":
             'https://www.youtube.com/watch?v=CFZETWI6cno',
             'https://www.youtube.com/watch?v=ut9-xKN0ZXE']
 
-    test = thread_downloader(URLS)
+    test = speech_daemon(URLS)
 
     print(test)
