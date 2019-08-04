@@ -5,7 +5,7 @@ import concurrent.futures
 '''
 Multithreaded version of speech.main with 5 workers and no diarization
 
-Returns a dictionary of Youtube URLs and GCP URI of the associated transcript
+Returns a dict of Youtube URLs and GCP URIs for the according transcript
 '''
 
 
