@@ -12,7 +12,7 @@ Returns a dict of Youtube URLs and GCP URIs for the according transcript
 def speech_daemon(urls):
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-        # Start the load operations and mark each URL with its future GCP URI
+        # Start daemons and mark each URL with its future GCP URI
 
         data = {}
 
