@@ -1,4 +1,4 @@
-# Video-Speech-to-Text (WORK IN PROGRESS)
+# Video-Speech-to-Text
 
 Let's say you're an analyst at Big Tech Company™ and the CEO wants to know what Tech reviewers on Youtube think of the company's latest laptop. You could manually watch every laptop review on YouTube and write a report, but that takes a long time. If there were 100 15-minute review vidoes, you'd have to spend a full 25 hours watching videos.
 
